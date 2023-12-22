@@ -3,85 +3,81 @@ import 'package:flutter/services.dart';
 
 import 'income_expenses.dart';
 
-class ExpensePage extends StatefulWidget {
-  const ExpensePage({Key? key}) : super(key: key);
+class Transaction {
+  String name;
+  double amount;
+  String category;
+  String title;
+  String date;
+  String remarks;
 
-  @override
-  ExpensePageState createState() => ExpensePageState();
+  Transaction({
+    required this.name,
+    required this.amount,
+    required this.category,
+    required this.title,
+    required this.date,
+    required this.remarks,
+  });
 }
 
-class ExpensePageState extends State<ExpensePage> {
-  final List<Income> incomeList = [];
-  final List<Expenses> expensesList = [];
+class FinancePage extends StatefulWidget {
+  const FinancePage({Key? key}) : super(key: key);
+
+  @override
+  FinancePageState createState() => FinancePageState();
+}
+
+class FinancePageState extends State<FinancePage> {
+  final List<Transaction> transactionsList = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
-  final TextEditingController cashController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
   final TextEditingController remarksController = TextEditingController();
 
-  void addIncome() {
-    final String name = nameController.text;
-    final double amount = double.tryParse(amountController.text) ?? 0.0;
-    final String sales = categoryController.text;
-    final double cash = double.tryParse(cashController.text) ?? 0.0;
-    final String remarks = remarksController.text;
-
-    if (name.isNotEmpty && amount > 0) {
-      final Income newIncome = Income(
-        name: name,
-        amount: amount,
-        sales: sales,
-        cash: cash,
-        remarks: remarks,
-      );
-      incomeList.add(newIncome);
-      nameController.clear();
-      amountController.clear();
-      categoryController.clear();
-      cashController.clear();
-      remarksController.clear();
-      _showDetailsPage(incomeList, calculateTotal(incomeList));
-    }
-  }
-
-  void addExpenses() {
+  void addTransaction() {
     final String name = nameController.text;
     final double amount = double.tryParse(amountController.text) ?? 0.0;
     final String category = categoryController.text;
-    final double cash = double.tryParse(cashController.text) ?? 0.0;
+    final String title = titleController.text;
+    final String date = dateController.text;
     final String remarks = remarksController.text;
 
     if (name.isNotEmpty && amount > 0) {
-      final Expenses newExpense = Expenses(
+      final Transaction newTransaction = Transaction(
         name: name,
         amount: amount,
         category: category,
-        cash: cash,
+        title: title,
+        date: date,
         remarks: remarks,
       );
-      expensesList.add(newExpense);
+      transactionsList.add(newTransaction);
       nameController.clear();
       amountController.clear();
       categoryController.clear();
-      cashController.clear();
+      titleController.clear();
+      dateController.clear();
       remarksController.clear();
-      _showDetailsPage(expensesList, calculateTotal(expensesList));
+      _showDetailsPage(transactionsList, calculateTotal(transactionsList));
     }
   }
 
-  void _showDetailsPage(List<dynamic> itemList, double total) {
+  void _showDetailsPage(List<Transaction> itemList, double total) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DetailsPage(
           totalAmount: total,
-          itemList: itemList,
+          transactionList: itemList,
         ),
       ),
     );
   }
 
-  double calculateTotal(List<dynamic> itemList) {
+  double calculateTotal(List<Transaction> itemList) {
     return itemList.fold(0, (prev, item) => prev + item.amount);
   }
 
@@ -97,6 +93,11 @@ class ExpensePageState extends State<ExpensePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             buildInputFields(),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: addTransaction,
+              child: const Text('Submit'),
+            ),
           ],
         ),
       ),
@@ -124,55 +125,20 @@ class ExpensePageState extends State<ExpensePage> {
               decoration: const InputDecoration(labelText: 'Category'),
             ),
             TextField(
-              controller: cashController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Cash'),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: titleController,
+              decoration: const InputDecoration(labelText: 'Title (Payment)'),
+            ),
+            TextField(
+              controller: dateController,
+              decoration: const InputDecoration(labelText: 'Date (Payment)'),
             ),
             TextField(
               controller: remarksController,
               decoration: const InputDecoration(labelText: 'Remarks'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: addExpenses,
-              child: const Text('Sumbit'),
             ),
           ],
         ),
       ),
     );
   }
-}
-
-class Income {
-  String name;
-  double amount;
-  String sales;
-  double cash;
-  String remarks;
-
-  Income({
-    required this.name,
-    required this.amount,
-    required this.sales,
-    required this.cash,
-    required this.remarks,
-  });
-}
-
-class Expenses {
-  String name;
-  double amount;
-  String category;
-  double cash;
-  String remarks;
-
-  Expenses({
-    required this.name,
-    required this.amount,
-    required this.category,
-    required this.cash,
-    required this.remarks,
-  });
 }

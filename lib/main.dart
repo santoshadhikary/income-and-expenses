@@ -61,7 +61,7 @@ class CashFlowHomePage extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ExpensePage()));
+                        builder: (context) => const FinancePage()));
               },
             ),
           ],
